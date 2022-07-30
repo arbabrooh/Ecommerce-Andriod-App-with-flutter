@@ -8,9 +8,10 @@ import "../widgets/product_item.dart";
 import "../providers/cart_provider.dart";
 
 class ProductGridView extends StatefulWidget {
+  final GlobalKey? key;
   final bool? isFav;
   final List<ProductModel>? searchList;
-  const ProductGridView(this.isFav, [this.searchList]);
+  const ProductGridView(this.key, this.isFav, [this.searchList]);
 
   @override
   _ProductGridViewState createState() => _ProductGridViewState();

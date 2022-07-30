@@ -35,7 +35,7 @@ class SideNavBar extends StatelessWidget {
           const Divider(),
           InkWell(
             onTap: () {
-              context.push(OrdersScreen.routeName);
+              context.go(OrdersScreen.routeName);
             },
             child: Column(
               children: [
@@ -48,7 +48,7 @@ class SideNavBar extends StatelessWidget {
           if (authData.emailAdress == AdminEmail.email)
             InkWell(
               onTap: () {
-                context.push(ProductManagementScreen.routeName);
+                context.go(ProductManagementScreen.routeName);
               },
               child: Column(
                 children: [
@@ -62,7 +62,7 @@ class SideNavBar extends StatelessWidget {
           if (authData.emailAdress == AdminEmail.email)
             InkWell(
               onTap: () {
-                context.pushNamed(ManageOrderScreen.routeName);
+                context.go(ManageOrderScreen.routeName);
               },
               child: Column(
                 children: [

@@ -246,27 +246,27 @@ class ProductProvider with ChangeNotifier {
     return searchList;
   }
 
-  List<ProductModel> bagProducts() {
-    List<ProductModel> searchList =
-        _items.where((element) => element.category == "Bags").toList();
+  List<ProductModel>? bagProducts() {
+    List<ProductModel>? searchList =
+        _items.where((element) => element.category! == "Bags").toList();
     return searchList;
   }
 
-  List<ProductModel> shoeProducts() {
-    List<ProductModel> searchList =
-        _items.where((element) => element.category == "Shoes").toList();
+  List<ProductModel>? shoeProducts() {
+    List<ProductModel>? searchList =
+        _items.where((element) => element.category! == "Shoes").toList();
     return searchList;
   }
 
-  List<ProductModel> clothingProducts() {
-    List<ProductModel> searchList =
-        _items.where((element) => element.category == "Clothing").toList();
+  List<ProductModel>? clothingProducts() {
+    List<ProductModel>? searchList =
+        _items.where((element) => element.category! == "Clothing").toList();
     return searchList;
   }
 
-  List<ProductModel> hairProducts() {
-    List<ProductModel> searchList =
-        _items.where((element) => element.category == "Hairs").toList();
+  List<ProductModel>? hairProducts() {
+    List<ProductModel>? searchList =
+        _items.where((element) => element.category! == "Hairs").toList();
     return searchList;
   }
 }

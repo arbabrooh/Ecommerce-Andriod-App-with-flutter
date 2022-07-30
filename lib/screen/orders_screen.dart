@@ -69,7 +69,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   }),
         ),
       ]),
-      drawer: AppDrawer(),
+      drawer: deviceWidth > 600 ? null : AppDrawer(),
     );
   }
 }

@@ -1,7 +1,7 @@
 import "dart:io";
 import "dart:typed_data";
 import 'package:image_picker/image_picker.dart';
-
+import 'package:uuid/uuid.dart';
 import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
@@ -10,6 +10,7 @@ import "package:firebase_storage/firebase_storage.dart";
 import "../models/product_model.dart";
 import "../providers/product_provider.dart";
 import "../widgets/image_added.dart";
+import '../widgets/main_drawer.dart';
 import '../widgets/sideNavBar.dart';
 
 class AddItem extends StatefulWidget {
@@ -123,15 +124,28 @@ class _AddItemState extends State<AddItem> {
       //this ensure the code below it in the method is not run
     }
 
-    // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    final ref = FirebaseStorage.instance
+    Reference ref = FirebaseStorage.instance
         .ref()
         .child("product_image")
-        .child(DateTime.now().toString() + ".jpg");
+        .child(Uuid().v1());
 
-    await ref.putData(_productImage!).whenComplete(() async {
-      attachedImageUrl = await ref.getDownloadURL();
-    });
+    ref = ref.child(DateTime.now().toString());
+
+    UploadTask uploadTask = ref
+        .putData(_productImage!); //using putData since it is a Uint8List file
+    TaskSnapshot snapshot = await uploadTask;
+
+    attachedImageUrl = await snapshot.ref.getDownloadURL();
+
+    // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    // final ref = FirebaseStorage.instance
+    //     .ref()
+    //     .child("product_image")
+    //     .child();
+
+    // await ref.putData(_productImage!).whenComplete(() async {
+    //   attachedImageUrl = await ref.getDownloadURL();
+    // });
 
     //_formKey is attached to the Form... hence it can be use to manipulate data save in the form
     _formKey.currentState?.save();
@@ -263,7 +277,7 @@ class _AddItemState extends State<AddItem> {
     final theme = Theme.of(context);
     return Scaffold(
         appBar: AppBar(title: const Text("Add Product")),
-        //
+        drawer: _deviceScreenSize.width > 600 ? null : AppDrawer(),
         body: Row(
           children: [
             if (_deviceScreenSize.width > 600) const SideNavBar(),

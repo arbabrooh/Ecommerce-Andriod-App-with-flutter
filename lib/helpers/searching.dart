@@ -34,9 +34,9 @@ class ProductSearch extends SearchDelegate<ProductModel?> {
         Provider.of<ProductProvider>(context, listen: false)
             .searchResult(query);
     if (result != null) {
-      return ProductGridView(isFavourite, result);
+      return ProductGridView(GlobalKey(), isFavourite, result);
     }
-    return ProductGridView(isFavourite);
+    return ProductGridView(GlobalKey(), isFavourite);
   }
 
   @override

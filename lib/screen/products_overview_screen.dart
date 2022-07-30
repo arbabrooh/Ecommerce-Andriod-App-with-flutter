@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
+import "package:go_router/go_router.dart";
 
 import '../helpers/searching.dart';
 import '../models/product_model.dart';
@@ -9,8 +10,6 @@ import "../providers/cart_provider.dart";
 import "../providers/product_provider.dart";
 import "./cart_screen.dart";
 import "../widgets/main_drawer.dart";
-// import "../providers/auth_provider.dart";
-// import "./auth_screen.dart";
 
 enum FavFilters {
   favourite,
@@ -26,90 +25,67 @@ class ProductsScreen extends StatefulWidget {
 }
 
 class _ProductsScreenState extends State<ProductsScreen> {
+  final _allProductKey = GlobalKey();
+  final _shoeProductkey = GlobalKey();
+  final _hairProductkey = GlobalKey();
+  final _clothProductkey = GlobalKey();
+  final _bagProductkey = GlobalKey();
   var _isLoading = false;
-  // var _initRun = false;
+  int _screenIndex = 0;
+  late PageController pageController;
 
-  List<Map<String, Object>> _screenList = [];
+  List<ProductModel>? _bagProducts;
+  List<ProductModel>? _clothingProducts;
+  List<ProductModel>? _hairProducts;
+  List<ProductModel>? _shoeProducts;
+
+  void pageChanger(int page) {
+    setState(() {
+      _screenIndex = page;
+    });
+  }
+
+  void navigationTapper(int page) {
+    pageController.jumpToPage(page);
+  }
 
   @override
   void initState() {
+    pageController = PageController();
     setState(() {
       _isLoading = true;
     });
 
-    // Future<void> init()async{
-
-    //try {
     Provider.of<ProductProvider>(context, listen: false)
         .fetchAndSetProduct()
         .then((_) {
       setState(() {
         _isLoading = false;
       });
-    }).then((_) {
-      final productsData = Provider.of<ProductProvider>(context, listen: false);
-      List<ProductModel> _bagProducts = productsData.bagProducts();
-      List<ProductModel> _clothingProducts = productsData.clothingProducts();
-      List<ProductModel> _hairProducts = productsData.hairProducts();
-      List<ProductModel> _shoeProducts = productsData.shoeProducts();
-
-      _screenList = [
-        {"screen": ProductGridView(_isFavourite), "title": "AllProduct"},
-        {
-          "screen": ProductGridView(_isFavourite, _bagProducts),
-          "title": "Bags"
-        },
-        {
-          "screen": ProductGridView(_isFavourite, _clothingProducts),
-          "title": "Clothings"
-        },
-        {
-          "screen": ProductGridView(_isFavourite, _hairProducts),
-          "title": "Hairs"
-        },
-        {
-          "screen": ProductGridView(_isFavourite, _shoeProducts),
-          "title": "Shoes"
-        },
-      ];
     });
-
-    ///....
-    // } catch (error) {
-
-    //   await showDialog(
-    //       context: context,
-    //       builder: (ctx) {
-    //         return AlertDialog(title: Text("Hello!"), content: Text("An Error error. Try again"), actions: [
-    //           TextButton(
-    //               child: Text("Okay"),
-    //               onPressed: () {
-    //                 Navigator.of(ctx).pop(true);
-    //               })
-    //         ]);
-    //       });
-    // }
-
-    // }
 
     super.initState();
   }
 
-  int _screenIndex = 0;
-
-  void _selectScreen(int index) {
-    setState(() {
-      _screenIndex = index;
-    });
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
   }
 
   var _isFavourite = false;
 
   @override
   Widget build(BuildContext context) {
+    final productsData = Provider.of<ProductProvider>(context, listen: false);
+    _bagProducts = productsData.bagProducts();
+    _clothingProducts = productsData.clothingProducts();
+    _hairProducts = productsData.hairProducts();
+    _shoeProducts = productsData.shoeProducts();
     //final authRef = Provider.of<AuthProvider>(context, listen:false);
 
     final theme = Theme.of(context);
+    final deviceSize = MediaQuery.of(context).size.width;
     return Scaffold(
         appBar: AppBar(title: const Text("Ese Shop"), actions: [
           IconButton(
@@ -145,19 +121,24 @@ class _ProductsScreenState extends State<ProductsScreen> {
               child: IconButton(
                   icon: const Icon(Icons.shopping_cart),
                   onPressed: () {
-                    //if (authRef.isAuth) {
-                    Navigator.of(context).pushNamed(
-                      CartScreen.routeName,
-                    );
-                    // } else {
-                    //   Navigator.of(context).pushNamed(AuthScreen.routeName);
-                    // }
+                    context.push(CartScreen.routeName);
                   })),
         ]),
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
-            : (_screenList[_screenIndex]["screen"] as Widget),
-        drawer: AppDrawer(),
+            : PageView(
+                children: [
+                  ProductGridView(_allProductKey, _isFavourite),
+                  ProductGridView(_bagProductkey, _isFavourite, _bagProducts),
+                  ProductGridView(
+                      _clothProductkey, _isFavourite, _clothingProducts),
+                  ProductGridView(_hairProductkey, _isFavourite, _hairProducts),
+                  ProductGridView(_shoeProductkey, _isFavourite, _shoeProducts),
+                ],
+                onPageChanged: pageChanger,
+                controller: pageController,
+              ),
+        drawer: deviceSize > 600 ? null : AppDrawer(),
         bottomNavigationBar: BottomNavigationBar(
           backgroundColor: theme.primaryColor,
           unselectedItemColor: Colors.white,
@@ -184,7 +165,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 icon: const Icon(Icons.local_mall),
                 label: "Shoes"),
           ],
-          onTap: _selectScreen,
+          onTap: navigationTapper,
           //currentIndex use to ensure flutter knows which we are while switching tab
           currentIndex: _screenIndex,
           //use to add shifting animation to our tab switching

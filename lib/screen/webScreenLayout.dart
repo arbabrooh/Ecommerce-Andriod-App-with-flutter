@@ -33,13 +33,34 @@ class _WebScreenState extends State<WebScreen> {
   var _isShoes = false;
   var _isClothings = false;
   var _isBag = false;
-  List<ProductModel> _bagProducts = [];
-  List<ProductModel> _clothingProducts = [];
-  List<ProductModel> _hairProducts = [];
-  List<ProductModel> _shoeProducts = [];
+  final _allProductKey = GlobalKey();
+  final _shoeProductkey = GlobalKey();
+  final _hairProductkey = GlobalKey();
+  final _clothProductkey = GlobalKey();
+  final _bagProductkey = GlobalKey();
+  List<ProductModel>? _bagProducts = [];
+  List<ProductModel>? _clothingProducts = [];
+  List<ProductModel>? _hairProducts = [];
+  List<ProductModel>? _shoeProducts = [];
+  int _screenIndex = 0;
+  late PageController pageController;
+
+  void pageChanger(int page) {
+    setState(() {
+      _screenIndex = page;
+    });
+  }
+
+  void navigationTapper(int page) {
+    setState(() {
+      _screenIndex = page;
+    });
+    pageController.jumpToPage(page);
+  }
 
   @override
   void initState() {
+    pageController = PageController();
     setState(() {
       _isLoading = true;
     });
@@ -50,20 +71,21 @@ class _WebScreenState extends State<WebScreen> {
       setState(() {
         _isLoading = false;
       });
-      final productsData = Provider.of<ProductProvider>(context, listen: false);
-      _bagProducts = productsData.bagProducts();
-      _clothingProducts = productsData.clothingProducts();
-      _hairProducts = productsData.hairProducts();
-      _shoeProducts = productsData.shoeProducts();
     });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final productsData = Provider.of<ProductProvider>(context, listen: false);
+
+    _bagProducts = productsData.bagProducts();
+    _clothingProducts = productsData.clothingProducts();
+    _hairProducts = productsData.hairProducts();
+    _shoeProducts = productsData.shoeProducts();
     var deviceSize = MediaQuery.of(context).size;
     return Scaffold(
-        drawer: AppDrawer(),
+        drawer: deviceSize.width > 600 ? null : AppDrawer(),
         appBar: AppBar(
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -85,15 +107,7 @@ class _WebScreenState extends State<WebScreen> {
               ),
               InkWell(
                 onTap: () {
-                  if (_isHairs) {
-                    setState(() {
-                      _isHairs = false;
-                    });
-                  } else {
-                    setState(() {
-                      _isHairs = true;
-                    });
-                  }
+                  navigationTapper(1);
                 },
                 child: Text("Hairs",
                     style: TextStyle(
@@ -104,15 +118,7 @@ class _WebScreenState extends State<WebScreen> {
               ),
               InkWell(
                 onTap: () {
-                  if (_isBag) {
-                    setState(() {
-                      _isBag = false;
-                    });
-                  } else {
-                    setState(() {
-                      _isBag = true;
-                    });
-                  }
+                  navigationTapper(2);
                 },
                 child: Text("Bags",
                     style: TextStyle(
@@ -123,15 +129,7 @@ class _WebScreenState extends State<WebScreen> {
               ),
               InkWell(
                   onTap: () {
-                    if (_isClothings) {
-                      setState(() {
-                        _isClothings = false;
-                      });
-                    } else {
-                      setState(() {
-                        _isClothings = true;
-                      });
-                    }
+                    navigationTapper(3);
                   },
                   child: Text("Clothings",
                       style: TextStyle(
@@ -141,15 +139,7 @@ class _WebScreenState extends State<WebScreen> {
                   focusColor: Colors.yellowAccent),
               InkWell(
                   onTap: () {
-                    if (_isShoes) {
-                      setState(() {
-                        _isShoes = false;
-                      });
-                    } else {
-                      setState(() {
-                        _isShoes = true;
-                      });
-                    }
+                    navigationTapper(4);
                   },
                   child: Text("Shoes",
                       style: TextStyle(
@@ -211,15 +201,34 @@ class _WebScreenState extends State<WebScreen> {
               width: deviceSize.width * 0.8,
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : _isHairs
-                      ? ProductGridView(_isFavourite, _hairProducts)
-                      : _isShoes
-                          ? ProductGridView(_isFavourite, _shoeProducts)
-                          : _isClothings
-                              ? ProductGridView(_isFavourite, _clothingProducts)
-                              : _isBag
-                                  ? ProductGridView(_isFavourite, _bagProducts)
-                                  : ProductGridView(_isFavourite),
+                  : PageView(
+                      children: [
+                        ProductGridView(_allProductKey, _isFavourite),
+                        ProductGridView(
+                            _hairProductkey, _isFavourite, _hairProducts),
+                        ProductGridView(
+                            _bagProductkey, _isFavourite, _bagProducts),
+                        ProductGridView(
+                            _clothProductkey, _isFavourite, _clothingProducts),
+                        ProductGridView(
+                            _shoeProductkey, _isFavourite, _shoeProducts),
+                      ],
+                      onPageChanged: pageChanger,
+                      controller: pageController,
+                    ),
+              //  _isHairs
+              //     ? ProductGridView(
+              //         GlobalKey(), _isFavourite, _hairProducts)
+              //     : _isShoes
+              //         ? ProductGridView(
+              //             GlobalKey(), _isFavourite, _shoeProducts)
+              //         : _isClothings
+              //             ? ProductGridView(
+              //                 GlobalKey(), _isFavourite, _clothingProducts)
+              //             : _isBag
+              //                 ? ProductGridView(
+              //                     GlobalKey(), _isFavourite, _bagProducts)
+              //                 : ProductGridView(GlobalKey(), _isFavourite),
             )
           ],
         ));

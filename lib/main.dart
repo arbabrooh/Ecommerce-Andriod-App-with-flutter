@@ -32,19 +32,19 @@ void main() async {
     //kIsWeb returns true if it was compile to run on web
     await Firebase.initializeApp(
         options: const FirebaseOptions(
-      apiKey: apikey,
-      appId: appId,
-      messagingSenderId: msgSenderId,
-      projectId: projectId,
-      storageBucket: storageBucketName,
-    ));
+            apiKey: apikey,
+            appId: appId,
+            messagingSenderId: msgSenderId,
+            projectId: projectId,
+            storageBucket: storageBucketName,
+            authDomain: "ese-server-db.firebaseapp.com"));
   } else {
     await Firebase
         .initializeApp(); //options: DefaultFirebaseOptions.currentPlatform);
   }
   runApp(MyApp());
 
-  return runApp(MyApp());
+  // return runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -105,21 +105,20 @@ class MyApp extends StatelessWidget {
           path: '/',
           builder: (context, state) {
             final authenData = Provider.of<AuthProvider>(context);
-            return authenData.isAuth
-                ? //const ProductsScreen()
-                const ResponsiveScreen(
-                    mobileScreenLayout: MobileScreen(),
-                    webScreenLayout: WebScreen(),
-                  )
-                :
-                //Future is use to active the onDeviceLogin since it a future and the futurebuilder will run everything build is run
-                FutureBuilder(
-                    future: authenData.onDeviceLogin(),
-                    builder: (cxt, dataSnapShot) =>
-                        (dataSnapShot.connectionState ==
-                                ConnectionState.waiting)
-                            ? SplashScreen()
-                            : const AuthScreen());
+            if (authenData.isAuth) {
+              return const ResponsiveScreen(
+                mobileScreenLayout: MobileScreen(),
+                webScreenLayout: WebScreen(),
+              );
+            } else {
+              //Future is use to active the onDeviceLogin since it a future and the futurebuilder will run everything build is run
+              return FutureBuilder(
+                  future: authenData.onDeviceLogin(),
+                  builder: (cxt, dataSnapShot) =>
+                      (dataSnapShot.connectionState == ConnectionState.waiting)
+                          ? SplashScreen()
+                          : const AuthScreen());
+            }
           },
         ),
         GoRoute(
@@ -162,20 +161,6 @@ class MyApp extends StatelessWidget {
             })
       ],
       errorBuilder: (BuildContext context, GoRouterState state) {
-        final authenData = Provider.of<AuthProvider>(context);
-        return authenData.isAuth
-            ? //const ProductsScreen()
-            const ResponsiveScreen(
-                mobileScreenLayout: MobileScreen(),
-                webScreenLayout: WebScreen(),
-              )
-            :
-            //Future is use to active the onDeviceLogin since it a future and the futurebuilder will run everything build is run
-            FutureBuilder(
-                future: authenData.onDeviceLogin(),
-                builder: (cxt, dataSnapShot) =>
-                    (dataSnapShot.connectionState == ConnectionState.waiting)
-                        ? SplashScreen()
-                        : const AuthScreen());
+        return const AuthScreen();
       });
 }

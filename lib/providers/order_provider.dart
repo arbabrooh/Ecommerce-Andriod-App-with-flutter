@@ -140,13 +140,13 @@ class OrderProvider with ChangeNotifier {
               orderDate: DateTime.parse(data["orderDate"]),
               orderNo: data["orderNo"],
               totalPrice: data["totalPrice"],
-              products: (data["products"] as List<dynamic>)
-                  .map((item) => CartItem(
-                      price: item["price"],
-                      quantity: item["quantity"],
-                      title: item["title"],
-                      id: item["id"]))
-                  .toList(),
+              products: (data["products"] as List<dynamic>).map((item) {
+                return CartItem(
+                    price: item["price"],
+                    quantity: item["quantity"],
+                    title: item["title"],
+                    id: item["id"]);
+              }).toList(),
             ));
       });
       //reversed.toList() is use to change newOrder in a reversed order and then to a list
@@ -171,6 +171,7 @@ class OrderProvider with ChangeNotifier {
       // if (_extractedData == null) {
       //   return;
       // }
+
       //id is the map key... data is the value
       final _extractList = _extractedData.values.toList();
 
@@ -178,7 +179,6 @@ class OrderProvider with ChangeNotifier {
         final items = element as Map<String, dynamic>;
         final itxs = items.values.toList();
         for (var item in itxs) {
-          print(item["totalPrice"].runtimeType);
           newOrder.insert(
               0,
               OrderItem(
@@ -188,23 +188,22 @@ class OrderProvider with ChangeNotifier {
                   customerPhoneNo: item["customerPhoneNo"],
                   orderNo: item["orderNo"],
                   orderDate: DateTime.parse(item["orderDate"]),
-                  totalPrice: (item["totalPrice"] as int).toDouble(),
-                  products: (item["products"] as List<dynamic>)
-                      .map((item) => CartItem(
-                          price: (item["price"] as int).toDouble(),
-                          quantity: item["quantity"],
-                          title: item["title"],
-                          id: item["id"]))
-                      .toList(),
+                  totalPrice: item["totalPrice"],
+                  products: (item["products"] as List<dynamic>).map((item) {
+                    return CartItem(
+                        price: (item["price"].toDouble()),
+                        quantity: item["quantity"],
+                        title: item["title"],
+                        id: item["id"]);
+                  }).toList(),
                   id: item["orderNo"]));
         }
       }
-
       //reversed.toList() is use to change newOrder in a reversed order and then to a list
       _allOrders = newOrder.reversed.toList();
       notifyListeners();
     } catch (error) {
-      //print(error);
+      debugPrint(error.toString());
       rethrow;
     }
   }

@@ -41,7 +41,7 @@ class AppDrawer extends StatelessWidget {
         title: const Text("Shop", style: TextStyle(fontSize: 20)),
         leading: const Icon(Icons.shopping_bag, size: 20),
         onTap: () {
-          Navigator.of(context).pushReplacementNamed("/");
+          context.go("/");
         },
       ),
       const Divider(),
@@ -49,7 +49,7 @@ class AppDrawer extends StatelessWidget {
           title: const Text("Orders", style: TextStyle(fontSize: 20)),
           leading: const Icon(Icons.payment, size: 20),
           onTap: () {
-            Navigator.of(context).pushReplacementNamed(OrdersScreen.routeName);
+            context.go(OrdersScreen.routeName);
           }),
       const Divider(),
       if (authData.emailAdress == "mradmin@admin.ese")
@@ -66,8 +66,7 @@ class AppDrawer extends StatelessWidget {
             title: const Text("Manage Orders", style: TextStyle(fontSize: 20)),
             leading: const Icon(Icons.create, size: 20),
             onTap: () {
-              Navigator.of(context)
-                  .pushReplacementNamed(ManageOrderScreen.routeName);
+              context.go(ManageOrderScreen.routeName);
             }),
       if (authData.emailAdress == AdminEmail.email) const Divider(),
       ListTile(
@@ -76,7 +75,7 @@ class AppDrawer extends StatelessWidget {
           onTap: () {
             Navigator.of(context)
                 .pop(); //to ensure the drawer is alway close to avoid an error;
-            Navigator.of(context).pushReplacementNamed("/");
+            context.go("/");
             authData.logOut();
           }),
     ]));
